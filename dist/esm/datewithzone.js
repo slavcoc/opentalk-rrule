@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DateWithZone = void 0;
-var dateutil_1 = require("./dateutil");
+import { timeToUntilString } from './dateutil';
 var DateWithZone = /** @class */ (function () {
     function DateWithZone(date, tzid) {
         if (isNaN(date.getTime())) {
@@ -18,7 +15,7 @@ var DateWithZone = /** @class */ (function () {
         configurable: true
     });
     DateWithZone.prototype.toString = function () {
-        var datestr = (0, dateutil_1.timeToUntilString)(this.date.getTime(), this.isUTC);
+        var datestr = timeToUntilString(this.date.getTime(), this.isUTC);
         if (!this.isUTC) {
             return ";TZID=".concat(this.tzid, ":").concat(datestr);
         }
@@ -40,5 +37,5 @@ var DateWithZone = /** @class */ (function () {
     };
     return DateWithZone;
 }());
-exports.DateWithZone = DateWithZone;
+export { DateWithZone };
 //# sourceMappingURL=datewithzone.js.map

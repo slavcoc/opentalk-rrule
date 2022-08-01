@@ -1,12 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var helpers_1 = require("../helpers");
-var types_1 = require("../types");
-var yearinfo_1 = require("./yearinfo");
-var monthinfo_1 = require("./monthinfo");
-var easter_1 = require("./easter");
-var datetime_1 = require("../datetime");
-var dateutil_1 = require("../dateutil");
+import { notEmpty, repeat, range, isPresent } from '../helpers';
+import { Frequency } from '../types';
+import { rebuildYear } from './yearinfo';
+import { rebuildMonth } from './monthinfo';
+import { easter } from './easter';
+import { Time } from '../datetime';
+import { datetime, sort, toOrdinal } from '../dateutil';
 // =============================================================================
 // Iterinfo
 // =============================================================================
@@ -18,15 +16,15 @@ var Iterinfo = /** @class */ (function () {
     Iterinfo.prototype.rebuild = function (year, month) {
         var options = this.options;
         if (year !== this.lastyear) {
-            this.yearinfo = (0, yearinfo_1.rebuildYear)(year, options);
+            this.yearinfo = rebuildYear(year, options);
         }
-        if ((0, helpers_1.notEmpty)(options.bynweekday) &&
+        if (notEmpty(options.bynweekday) &&
             (month !== this.lastmonth || year !== this.lastyear)) {
             var _a = this.yearinfo, yearlen = _a.yearlen, mrange = _a.mrange, wdaymask = _a.wdaymask;
-            this.monthinfo = (0, monthinfo_1.rebuildMonth)(year, month, yearlen, mrange, wdaymask, options);
+            this.monthinfo = rebuildMonth(year, month, yearlen, mrange, wdaymask, options);
         }
-        if ((0, helpers_1.isPresent)(options.byeaster)) {
-            this.eastermask = (0, easter_1.easter)(year, options.byeaster);
+        if (isPresent(options.byeaster)) {
+            this.eastermask = easter(year, options.byeaster);
         }
     };
     Object.defineProperty(Iterinfo.prototype, "lastyear", {
@@ -114,20 +112,20 @@ var Iterinfo = /** @class */ (function () {
         configurable: true
     });
     Iterinfo.prototype.ydayset = function () {
-        return [(0, helpers_1.range)(this.yearlen), 0, this.yearlen];
+        return [range(this.yearlen), 0, this.yearlen];
     };
     Iterinfo.prototype.mdayset = function (_, month) {
         var start = this.mrange[month - 1];
         var end = this.mrange[month];
-        var set = (0, helpers_1.repeat)(null, this.yearlen);
+        var set = repeat(null, this.yearlen);
         for (var i = start; i < end; i++)
             set[i] = i;
         return [set, start, end];
     };
     Iterinfo.prototype.wdayset = function (year, month, day) {
         // We need to handle cross-year weeks here.
-        var set = (0, helpers_1.repeat)(null, this.yearlen + 7);
-        var i = (0, dateutil_1.toOrdinal)((0, dateutil_1.datetime)(year, month, day)) - this.yearordinal;
+        var set = repeat(null, this.yearlen + 7);
+        var i = toOrdinal(datetime(year, month, day)) - this.yearordinal;
         var start = i;
         for (var j = 0; j < 7; j++) {
             set[i] = i;
@@ -138,8 +136,8 @@ var Iterinfo = /** @class */ (function () {
         return [set, start, i];
     };
     Iterinfo.prototype.ddayset = function (year, month, day) {
-        var set = (0, helpers_1.repeat)(null, this.yearlen);
-        var i = (0, dateutil_1.toOrdinal)((0, dateutil_1.datetime)(year, month, day)) - this.yearordinal;
+        var set = repeat(null, this.yearlen);
+        var i = toOrdinal(datetime(year, month, day)) - this.yearordinal;
         set[i] = i;
         return [set, i, i + 1];
     };
@@ -149,26 +147,26 @@ var Iterinfo = /** @class */ (function () {
         this.options.byminute.forEach(function (minute) {
             set = set.concat(_this.mtimeset(hour, minute, second, millisecond));
         });
-        (0, dateutil_1.sort)(set);
+        sort(set);
         return set;
     };
     Iterinfo.prototype.mtimeset = function (hour, minute, _, millisecond) {
-        var set = this.options.bysecond.map(function (second) { return new datetime_1.Time(hour, minute, second, millisecond); });
-        (0, dateutil_1.sort)(set);
+        var set = this.options.bysecond.map(function (second) { return new Time(hour, minute, second, millisecond); });
+        sort(set);
         return set;
     };
     Iterinfo.prototype.stimeset = function (hour, minute, second, millisecond) {
-        return [new datetime_1.Time(hour, minute, second, millisecond)];
+        return [new Time(hour, minute, second, millisecond)];
     };
     Iterinfo.prototype.getdayset = function (freq) {
         switch (freq) {
-            case types_1.Frequency.YEARLY:
+            case Frequency.YEARLY:
                 return this.ydayset.bind(this);
-            case types_1.Frequency.MONTHLY:
+            case Frequency.MONTHLY:
                 return this.mdayset.bind(this);
-            case types_1.Frequency.WEEKLY:
+            case Frequency.WEEKLY:
                 return this.wdayset.bind(this);
-            case types_1.Frequency.DAILY:
+            case Frequency.DAILY:
                 return this.ddayset.bind(this);
             default:
                 return this.ddayset.bind(this);
@@ -176,15 +174,15 @@ var Iterinfo = /** @class */ (function () {
     };
     Iterinfo.prototype.gettimeset = function (freq) {
         switch (freq) {
-            case types_1.Frequency.HOURLY:
+            case Frequency.HOURLY:
                 return this.htimeset.bind(this);
-            case types_1.Frequency.MINUTELY:
+            case Frequency.MINUTELY:
                 return this.mtimeset.bind(this);
-            case types_1.Frequency.SECONDLY:
+            case Frequency.SECONDLY:
                 return this.stimeset.bind(this);
         }
     };
     return Iterinfo;
 }());
-exports.default = Iterinfo;
+export default Iterinfo;
 //# sourceMappingURL=index.js.map

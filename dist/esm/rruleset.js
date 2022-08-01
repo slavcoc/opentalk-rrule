@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.RRuleSet = void 0;
-var tslib_1 = require("tslib");
-var rrule_1 = require("./rrule");
-var dateutil_1 = require("./dateutil");
-var helpers_1 = require("./helpers");
-var iterset_1 = require("./iterset");
-var rrulestr_1 = require("./rrulestr");
-var optionstostring_1 = require("./optionstostring");
+import { __extends } from "tslib";
+import { RRule } from './rrule';
+import { sort, timeToUntilString } from './dateutil';
+import { includes } from './helpers';
+import { iterSet } from './iterset';
+import { rrulestr } from './rrulestr';
+import { optionsToString } from './optionstostring';
 function createGetterSetter(fieldName) {
     var _this = this;
     return function (field) {
@@ -26,7 +23,7 @@ function createGetterSetter(fieldName) {
     };
 }
 var RRuleSet = /** @class */ (function (_super) {
-    tslib_1.__extends(RRuleSet, _super);
+    __extends(RRuleSet, _super);
     /**
      *
      * @param {Boolean?} noCache
@@ -45,7 +42,7 @@ var RRuleSet = /** @class */ (function (_super) {
         return _this;
     }
     RRuleSet.prototype._iter = function (iterResult) {
-        return (0, iterset_1.iterSet)(iterResult, this._rrule, this._exrule, this._rdate, this._exdate, this.tzid());
+        return iterSet(iterResult, this._rrule, this._exrule, this._rdate, this._exdate, this.tzid());
     };
     /**
      * Adds an RRule to the set
@@ -85,7 +82,7 @@ var RRuleSet = /** @class */ (function (_super) {
      * @return List of rrules
      */
     RRuleSet.prototype.rrules = function () {
-        return this._rrule.map(function (e) { return (0, rrulestr_1.rrulestr)(e.toString()); });
+        return this._rrule.map(function (e) { return rrulestr(e.toString()); });
     };
     /**
      * Get list of excluded rrules in this recurrence set.
@@ -93,7 +90,7 @@ var RRuleSet = /** @class */ (function (_super) {
      * @return List of exrules
      */
     RRuleSet.prototype.exrules = function () {
-        return this._exrule.map(function (e) { return (0, rrulestr_1.rrulestr)(e.toString()); });
+        return this._exrule.map(function (e) { return rrulestr(e.toString()); });
     };
     /**
      * Get list of included datetimes in this recurrence set.
@@ -114,7 +111,7 @@ var RRuleSet = /** @class */ (function (_super) {
     RRuleSet.prototype.valueOf = function () {
         var result = [];
         if (!this._rrule.length && this._dtstart) {
-            result = result.concat((0, optionstostring_1.optionsToString)({ dtstart: this._dtstart }));
+            result = result.concat(optionsToString({ dtstart: this._dtstart }));
         }
         this._rrule.forEach(function (rrule) {
             result = result.concat(rrule.toString().split('\n'));
@@ -155,13 +152,13 @@ var RRuleSet = /** @class */ (function (_super) {
         return rrs;
     };
     return RRuleSet;
-}(rrule_1.RRule));
-exports.RRuleSet = RRuleSet;
+}(RRule));
+export { RRuleSet };
 function _addRule(rrule, collection) {
-    if (!(rrule instanceof rrule_1.RRule)) {
+    if (!(rrule instanceof RRule)) {
         throw new TypeError(String(rrule) + ' is not RRule instance');
     }
-    if (!(0, helpers_1.includes)(collection.map(String), String(rrule))) {
+    if (!includes(collection.map(String), String(rrule))) {
         collection.push(rrule);
     }
 }
@@ -169,16 +166,16 @@ function _addDate(date, collection) {
     if (!(date instanceof Date)) {
         throw new TypeError(String(date) + ' is not Date instance');
     }
-    if (!(0, helpers_1.includes)(collection.map(Number), Number(date))) {
+    if (!includes(collection.map(Number), Number(date))) {
         collection.push(date);
-        (0, dateutil_1.sort)(collection);
+        sort(collection);
     }
 }
 function rdatesToString(param, rdates, tzid) {
     var isUTC = !tzid || tzid.toUpperCase() === 'UTC';
     var header = isUTC ? "".concat(param, ":") : "".concat(param, ";TZID=").concat(tzid, ":");
     var dateString = rdates
-        .map(function (rdate) { return (0, dateutil_1.timeToUntilString)(rdate.valueOf(), isUTC); })
+        .map(function (rdate) { return timeToUntilString(rdate.valueOf(), isUTC); })
         .join(',');
     return "".concat(header).concat(dateString);
 }

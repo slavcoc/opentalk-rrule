@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var tslib_1 = require("tslib");
-var i18n_1 = tslib_1.__importDefault(require("./i18n"));
-var rrule_1 = require("../rrule");
+import ENGLISH from './i18n';
+import { RRule } from '../rrule';
 // =============================================================================
 // Parser
 // =============================================================================
@@ -77,8 +74,8 @@ var Parser = /** @class */ (function () {
     };
     return Parser;
 }());
-function parseText(text, language) {
-    if (language === void 0) { language = i18n_1.default; }
+export default function parseText(text, language) {
+    if (language === void 0) { language = ENGLISH; }
     var options = {};
     var ttr = new Parser(language.tokens);
     if (!ttr.start(text))
@@ -95,7 +92,7 @@ function parseText(text, language) {
             throw new Error('Unexpected end');
         switch (ttr.symbol) {
             case 'day(s)':
-                options.freq = rrule_1.RRule.DAILY;
+                options.freq = RRule.DAILY;
                 if (ttr.nextSymbol()) {
                     AT();
                     F();
@@ -104,41 +101,41 @@ function parseText(text, language) {
             // FIXME Note: every 2 weekdays != every two weeks on weekdays.
             // DAILY on weekdays is not a valid rule
             case 'weekday(s)':
-                options.freq = rrule_1.RRule.WEEKLY;
-                options.byweekday = [rrule_1.RRule.MO, rrule_1.RRule.TU, rrule_1.RRule.WE, rrule_1.RRule.TH, rrule_1.RRule.FR];
+                options.freq = RRule.WEEKLY;
+                options.byweekday = [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR];
                 ttr.nextSymbol();
                 F();
                 break;
             case 'week(s)':
-                options.freq = rrule_1.RRule.WEEKLY;
+                options.freq = RRule.WEEKLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'hour(s)':
-                options.freq = rrule_1.RRule.HOURLY;
+                options.freq = RRule.HOURLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'minute(s)':
-                options.freq = rrule_1.RRule.MINUTELY;
+                options.freq = RRule.MINUTELY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'month(s)':
-                options.freq = rrule_1.RRule.MONTHLY;
+                options.freq = RRule.MONTHLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'year(s)':
-                options.freq = rrule_1.RRule.YEARLY;
+                options.freq = RRule.YEARLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
@@ -151,11 +148,11 @@ function parseText(text, language) {
             case 'friday':
             case 'saturday':
             case 'sunday':
-                options.freq = rrule_1.RRule.WEEKLY;
+                options.freq = RRule.WEEKLY;
                 var key = ttr.symbol
                     .substr(0, 2)
                     .toUpperCase();
-                options.byweekday = [rrule_1.RRule[key]];
+                options.byweekday = [RRule[key]];
                 if (!ttr.nextSymbol())
                     return;
                 // TODO check for duplicates
@@ -166,7 +163,7 @@ function parseText(text, language) {
                     if (!wkd) {
                         throw new Error('Unexpected symbol ' + ttr.symbol + ', expected weekday');
                     }
-                    options.byweekday.push(rrule_1.RRule[wkd]);
+                    options.byweekday.push(RRule[wkd]);
                     ttr.nextSymbol();
                 }
                 MDAYs();
@@ -184,7 +181,7 @@ function parseText(text, language) {
             case 'october':
             case 'november':
             case 'december':
-                options.freq = rrule_1.RRule.YEARLY;
+                options.freq = RRule.YEARLY;
                 options.bymonth = [decodeM()];
                 if (!ttr.nextSymbol())
                     return;
@@ -222,7 +219,7 @@ function parseText(text, language) {
                     ttr.nextSymbol();
                     if (!options.byweekday)
                         options.byweekday = [];
-                    options.byweekday.push(rrule_1.RRule[wkd].nth(nth));
+                    options.byweekday.push(RRule[wkd].nth(nth));
                 }
                 else {
                     if (!options.bymonthday)
@@ -236,12 +233,12 @@ function parseText(text, language) {
                 ttr.nextSymbol();
                 if (!options.byweekday)
                     options.byweekday = [];
-                options.byweekday.push(rrule_1.RRule[wkd]);
+                options.byweekday.push(RRule[wkd]);
             }
             else if (ttr.symbol === 'weekday(s)') {
                 ttr.nextSymbol();
                 if (!options.byweekday) {
-                    options.byweekday = [rrule_1.RRule.MO, rrule_1.RRule.TU, rrule_1.RRule.WE, rrule_1.RRule.TH, rrule_1.RRule.FR];
+                    options.byweekday = [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR];
                 }
             }
             else if (ttr.symbol === 'week(s)') {
@@ -388,5 +385,4 @@ function parseText(text, language) {
         }
     }
 }
-exports.default = parseText;
 //# sourceMappingURL=parsetext.js.map

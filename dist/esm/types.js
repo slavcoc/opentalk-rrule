@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.freqIsDailyOrGreater = exports.Frequency = void 0;
-var Frequency;
+export var Frequency;
 (function (Frequency) {
     Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
     Frequency[Frequency["MONTHLY"] = 1] = "MONTHLY";
@@ -10,9 +7,8 @@ var Frequency;
     Frequency[Frequency["HOURLY"] = 4] = "HOURLY";
     Frequency[Frequency["MINUTELY"] = 5] = "MINUTELY";
     Frequency[Frequency["SECONDLY"] = 6] = "SECONDLY";
-})(Frequency = exports.Frequency || (exports.Frequency = {}));
-function freqIsDailyOrGreater(freq) {
+})(Frequency || (Frequency = {}));
+export function freqIsDailyOrGreater(freq) {
     return freq < Frequency.HOURLY;
 }
-exports.freqIsDailyOrGreater = freqIsDailyOrGreater;
 //# sourceMappingURL=types.js.map

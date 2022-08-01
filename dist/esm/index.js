@@ -1,4 +1,3 @@
-"use strict";
 /* !
  * rrule.js - Library for working with recurrence rules for calendar dates.
  * https://github.com/jakubroztocil/rrule
@@ -14,18 +13,10 @@
  * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
  *
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.datetime = exports.Weekday = exports.Frequency = exports.rrulestr = exports.RRuleSet = exports.RRule = void 0;
-var rrule_1 = require("./rrule");
-Object.defineProperty(exports, "RRule", { enumerable: true, get: function () { return rrule_1.RRule; } });
-var rruleset_1 = require("./rruleset");
-Object.defineProperty(exports, "RRuleSet", { enumerable: true, get: function () { return rruleset_1.RRuleSet; } });
-var rrulestr_1 = require("./rrulestr");
-Object.defineProperty(exports, "rrulestr", { enumerable: true, get: function () { return rrulestr_1.rrulestr; } });
-var types_1 = require("./types");
-Object.defineProperty(exports, "Frequency", { enumerable: true, get: function () { return types_1.Frequency; } });
-var weekday_1 = require("./weekday");
-Object.defineProperty(exports, "Weekday", { enumerable: true, get: function () { return weekday_1.Weekday; } });
-var dateutil_1 = require("./dateutil");
-Object.defineProperty(exports, "datetime", { enumerable: true, get: function () { return dateutil_1.datetime; } });
+export { RRule } from './rrule';
+export { RRuleSet } from './rruleset';
+export { rrulestr } from './rrulestr';
+export { Frequency } from './types';
+export { Weekday } from './weekday';
+export { datetime } from './dateutil';
 //# sourceMappingURL=index.js.map

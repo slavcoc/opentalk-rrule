@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildPoslist = void 0;
-var dateutil_1 = require("../dateutil");
-var helpers_1 = require("../helpers");
-function buildPoslist(bysetpos, timeset, start, end, ii, dayset) {
+import { combine, fromOrdinal, sort } from '../dateutil';
+import { pymod, isPresent, includes } from '../helpers';
+export function buildPoslist(bysetpos, timeset, start, end, ii, dayset) {
     var poslist = [];
     for (var j = 0; j < bysetpos.length; j++) {
         var daypos = void 0;
@@ -11,16 +8,16 @@ function buildPoslist(bysetpos, timeset, start, end, ii, dayset) {
         var pos = bysetpos[j];
         if (pos < 0) {
             daypos = Math.floor(pos / timeset.length);
-            timepos = (0, helpers_1.pymod)(pos, timeset.length);
+            timepos = pymod(pos, timeset.length);
         }
         else {
             daypos = Math.floor((pos - 1) / timeset.length);
-            timepos = (0, helpers_1.pymod)(pos - 1, timeset.length);
+            timepos = pymod(pos - 1, timeset.length);
         }
         var tmp = [];
         for (var k = start; k < end; k++) {
             var val = dayset[k];
-            if (!(0, helpers_1.isPresent)(val))
+            if (!isPresent(val))
                 continue;
             tmp.push(val);
         }
@@ -32,15 +29,14 @@ function buildPoslist(bysetpos, timeset, start, end, ii, dayset) {
             i = tmp[daypos];
         }
         var time = timeset[timepos];
-        var date = (0, dateutil_1.fromOrdinal)(ii.yearordinal + i);
-        var res = (0, dateutil_1.combine)(date, time);
+        var date = fromOrdinal(ii.yearordinal + i);
+        var res = combine(date, time);
         // XXX: can this ever be in the array?
         // - compare the actual date instead?
-        if (!(0, helpers_1.includes)(poslist, res))
+        if (!includes(poslist, res))
             poslist.push(res);
     }
-    (0, dateutil_1.sort)(poslist);
+    sort(poslist);
     return poslist;
 }
-exports.buildPoslist = buildPoslist;
 //# sourceMappingURL=poslist.js.map

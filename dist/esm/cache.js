@@ -1,10 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Cache = void 0;
-var tslib_1 = require("tslib");
-var iterresult_1 = tslib_1.__importDefault(require("./iterresult"));
-var dateutil_1 = require("./dateutil");
-var helpers_1 = require("./helpers");
+import IterResult from './iterresult';
+import { clone, cloneDates } from './dateutil';
+import { isArray } from './helpers';
 function argsMatch(left, right) {
     if (Array.isArray(left)) {
         if (!Array.isArray(right))
@@ -32,7 +28,7 @@ var Cache = /** @class */ (function () {
      */
     Cache.prototype._cacheAdd = function (what, value, args) {
         if (value) {
-            value = value instanceof Date ? (0, dateutil_1.clone)(value) : (0, dateutil_1.cloneDates)(value);
+            value = value instanceof Date ? clone(value) : cloneDates(value);
         }
         if (what === 'all') {
             this.all = value;
@@ -65,7 +61,7 @@ var Cache = /** @class */ (function () {
         if (what === 'all') {
             cached = this.all;
         }
-        else if ((0, helpers_1.isArray)(cachedObject)) {
+        else if (isArray(cachedObject)) {
             // Let's see whether we've already called the
             // 'what' method with the same 'args'
             for (var i = 0; i < cachedObject.length; i++) {
@@ -79,7 +75,7 @@ var Cache = /** @class */ (function () {
         if (!cached && this.all) {
             // Not in the cache, but we already know all the occurrences,
             // so we can find the correct dates from the cached ones.
-            var iterResult = new iterresult_1.default(what, args);
+            var iterResult = new IterResult(what, args);
             for (var i = 0; i < this.all.length; i++) {
                 if (!iterResult.accept(this.all[i]))
                     break;
@@ -87,13 +83,13 @@ var Cache = /** @class */ (function () {
             cached = iterResult.getValue();
             this._cacheAdd(what, cached, args);
         }
-        return (0, helpers_1.isArray)(cached)
-            ? (0, dateutil_1.cloneDates)(cached)
+        return isArray(cached)
+            ? cloneDates(cached)
             : cached instanceof Date
-                ? (0, dateutil_1.clone)(cached)
+                ? clone(cached)
                 : cached;
     };
     return Cache;
 }());
-exports.Cache = Cache;
+export { Cache };
 //# sourceMappingURL=cache.js.map

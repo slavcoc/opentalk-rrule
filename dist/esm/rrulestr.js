@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.rrulestr = exports.parseInput = void 0;
-var tslib_1 = require("tslib");
-var rrule_1 = require("./rrule");
-var rruleset_1 = require("./rruleset");
-var dateutil_1 = require("./dateutil");
-var helpers_1 = require("./helpers");
-var parsestring_1 = require("./parsestring");
+import { __assign } from "tslib";
+import { RRule } from './rrule';
+import { RRuleSet } from './rruleset';
+import { untilStringToDate } from './dateutil';
+import { includes, split } from './helpers';
+import { parseString, parseDtstart } from './parsestring';
 /**
  * RRuleStr
  * To parse a set of rrule strings
@@ -19,12 +16,12 @@ var DEFAULT_OPTIONS = {
     compatible: false,
     tzid: null,
 };
-function parseInput(s, options) {
+export function parseInput(s, options) {
     var rrulevals = [];
     var rdatevals = [];
     var exrulevals = [];
     var exdatevals = [];
-    var parsedDtstart = (0, parsestring_1.parseDtstart)(s);
+    var parsedDtstart = parseDtstart(s);
     var dtstart = parsedDtstart.dtstart;
     var tzid = parsedDtstart.tzid;
     var lines = splitIntoLines(s, options.unfold);
@@ -38,7 +35,7 @@ function parseInput(s, options) {
                 if (parms.length) {
                     throw new Error("unsupported RRULE parm: ".concat(parms.join(',')));
                 }
-                rrulevals.push((0, parsestring_1.parseString)(line));
+                rrulevals.push(parseString(line));
                 break;
             case 'RDATE':
                 var _c = (_a = /RDATE(?:;TZID=([^:=]+))?/i.exec(line)) !== null && _a !== void 0 ? _a : [], rdateTzid = _c[1];
@@ -51,7 +48,7 @@ function parseInput(s, options) {
                 if (parms.length) {
                     throw new Error("unsupported EXRULE parm: ".concat(parms.join(',')));
                 }
-                exrulevals.push((0, parsestring_1.parseString)(value));
+                exrulevals.push(parseString(value));
                 break;
             case 'EXDATE':
                 exdatevals = exdatevals.concat(parseRDate(value, parms));
@@ -71,7 +68,6 @@ function parseInput(s, options) {
         exdatevals: exdatevals,
     };
 }
-exports.parseInput = parseInput;
 function buildRule(s, options) {
     var _a = parseInput(s, options), rrulevals = _a.rrulevals, rdatevals = _a.rdatevals, exrulevals = _a.exrulevals, exdatevals = _a.exdatevals, dtstart = _a.dtstart, tzid = _a.tzid;
     var noCache = options.cache === false;
@@ -84,17 +80,17 @@ function buildRule(s, options) {
         rdatevals.length ||
         exrulevals.length ||
         exdatevals.length) {
-        var rset_1 = new rruleset_1.RRuleSet(noCache);
+        var rset_1 = new RRuleSet(noCache);
         rset_1.dtstart(dtstart);
         rset_1.tzid(tzid || undefined);
         rrulevals.forEach(function (val) {
-            rset_1.rrule(new rrule_1.RRule(groomRruleOptions(val, dtstart, tzid), noCache));
+            rset_1.rrule(new RRule(groomRruleOptions(val, dtstart, tzid), noCache));
         });
         rdatevals.forEach(function (date) {
             rset_1.rdate(date);
         });
         exrulevals.forEach(function (val) {
-            rset_1.exrule(new rrule_1.RRule(groomRruleOptions(val, dtstart, tzid), noCache));
+            rset_1.exrule(new RRule(groomRruleOptions(val, dtstart, tzid), noCache));
         });
         exdatevals.forEach(function (date) {
             rset_1.exdate(date);
@@ -104,28 +100,27 @@ function buildRule(s, options) {
         return rset_1;
     }
     var val = rrulevals[0] || {};
-    return new rrule_1.RRule(groomRruleOptions(val, val.dtstart || options.dtstart || dtstart, val.tzid || options.tzid || tzid), noCache);
+    return new RRule(groomRruleOptions(val, val.dtstart || options.dtstart || dtstart, val.tzid || options.tzid || tzid), noCache);
 }
-function rrulestr(s, options) {
+export function rrulestr(s, options) {
     if (options === void 0) { options = {}; }
     return buildRule(s, initializeOptions(options));
 }
-exports.rrulestr = rrulestr;
 function groomRruleOptions(val, dtstart, tzid) {
-    return tslib_1.__assign(tslib_1.__assign({}, val), { dtstart: dtstart, tzid: tzid });
+    return __assign(__assign({}, val), { dtstart: dtstart, tzid: tzid });
 }
 function initializeOptions(options) {
     var invalid = [];
     var keys = Object.keys(options);
     var defaultKeys = Object.keys(DEFAULT_OPTIONS);
     keys.forEach(function (key) {
-        if (!(0, helpers_1.includes)(defaultKeys, key))
+        if (!includes(defaultKeys, key))
             invalid.push(key);
     });
     if (invalid.length) {
         throw new Error('Invalid options: ' + invalid.join(', '));
     }
-    return tslib_1.__assign(tslib_1.__assign({}, DEFAULT_OPTIONS), options);
+    return __assign(__assign({}, DEFAULT_OPTIONS), options);
 }
 function extractName(line) {
     if (line.indexOf(':') === -1) {
@@ -134,7 +129,7 @@ function extractName(line) {
             value: line,
         };
     }
-    var _a = (0, helpers_1.split)(line, ':', 1), name = _a[0], value = _a[1];
+    var _a = split(line, ':', 1), name = _a[0], value = _a[1];
     return {
         name: name,
         value: value,
@@ -188,6 +183,6 @@ function validateDateParm(parms) {
 }
 function parseRDate(rdateval, parms) {
     validateDateParm(parms);
-    return rdateval.split(',').map(function (datestr) { return (0, dateutil_1.untilStringToDate)(datestr); });
+    return rdateval.split(',').map(function (datestr) { return untilStringToDate(datestr); });
 }
 //# sourceMappingURL=rrulestr.js.map

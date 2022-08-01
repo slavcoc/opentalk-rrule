@@ -1,51 +1,47 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildTimeset = exports.parseOptions = exports.initializeOptions = void 0;
-var tslib_1 = require("tslib");
-var types_1 = require("./types");
-var helpers_1 = require("./helpers");
-var rrule_1 = require("./rrule");
-var dateutil_1 = require("./dateutil");
-var weekday_1 = require("./weekday");
-var datetime_1 = require("./datetime");
-function initializeOptions(options) {
+import { __assign } from "tslib";
+import { freqIsDailyOrGreater } from './types';
+import { includes, notEmpty, isPresent, isNumber, isArray, isWeekdayStr, } from './helpers';
+import { RRule, defaultKeys, DEFAULT_OPTIONS } from './rrule';
+import { getWeekday, isDate, isValidDate } from './dateutil';
+import { Weekday } from './weekday';
+import { Time } from './datetime';
+export function initializeOptions(options) {
     var invalid = [];
     var keys = Object.keys(options);
     // Shallow copy for options and origOptions and check for invalid
     for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
         var key = keys_1[_i];
-        if (!(0, helpers_1.includes)(rrule_1.defaultKeys, key))
+        if (!includes(defaultKeys, key))
             invalid.push(key);
-        if ((0, dateutil_1.isDate)(options[key]) && !(0, dateutil_1.isValidDate)(options[key])) {
+        if (isDate(options[key]) && !isValidDate(options[key])) {
             invalid.push(key);
         }
     }
     if (invalid.length) {
         throw new Error('Invalid options: ' + invalid.join(', '));
     }
-    return tslib_1.__assign({}, options);
+    return __assign({}, options);
 }
-exports.initializeOptions = initializeOptions;
-function parseOptions(options) {
-    var opts = tslib_1.__assign(tslib_1.__assign({}, rrule_1.DEFAULT_OPTIONS), initializeOptions(options));
-    if ((0, helpers_1.isPresent)(opts.byeaster))
-        opts.freq = rrule_1.RRule.YEARLY;
-    if (!((0, helpers_1.isPresent)(opts.freq) && rrule_1.RRule.FREQUENCIES[opts.freq])) {
+export function parseOptions(options) {
+    var opts = __assign(__assign({}, DEFAULT_OPTIONS), initializeOptions(options));
+    if (isPresent(opts.byeaster))
+        opts.freq = RRule.YEARLY;
+    if (!(isPresent(opts.freq) && RRule.FREQUENCIES[opts.freq])) {
         throw new Error("Invalid frequency: ".concat(opts.freq, " ").concat(options.freq));
     }
     if (!opts.dtstart)
         opts.dtstart = new Date(new Date().setMilliseconds(0));
-    if (!(0, helpers_1.isPresent)(opts.wkst)) {
-        opts.wkst = rrule_1.RRule.MO.weekday;
+    if (!isPresent(opts.wkst)) {
+        opts.wkst = RRule.MO.weekday;
     }
-    else if ((0, helpers_1.isNumber)(opts.wkst)) {
+    else if (isNumber(opts.wkst)) {
         // cool, just keep it like that
     }
     else {
         opts.wkst = opts.wkst.weekday;
     }
-    if ((0, helpers_1.isPresent)(opts.bysetpos)) {
-        if ((0, helpers_1.isNumber)(opts.bysetpos))
+    if (isPresent(opts.bysetpos)) {
+        if (isNumber(opts.bysetpos))
             opts.bysetpos = [opts.bysetpos];
         for (var i = 0; i < opts.bysetpos.length; i++) {
             var v = opts.bysetpos[i];
@@ -55,42 +51,42 @@ function parseOptions(options) {
         }
     }
     if (!(Boolean(opts.byweekno) ||
-        (0, helpers_1.notEmpty)(opts.byweekno) ||
-        (0, helpers_1.notEmpty)(opts.byyearday) ||
+        notEmpty(opts.byweekno) ||
+        notEmpty(opts.byyearday) ||
         Boolean(opts.bymonthday) ||
-        (0, helpers_1.notEmpty)(opts.bymonthday) ||
-        (0, helpers_1.isPresent)(opts.byweekday) ||
-        (0, helpers_1.isPresent)(opts.byeaster))) {
+        notEmpty(opts.bymonthday) ||
+        isPresent(opts.byweekday) ||
+        isPresent(opts.byeaster))) {
         switch (opts.freq) {
-            case rrule_1.RRule.YEARLY:
+            case RRule.YEARLY:
                 if (!opts.bymonth)
                     opts.bymonth = opts.dtstart.getUTCMonth() + 1;
                 opts.bymonthday = opts.dtstart.getUTCDate();
                 break;
-            case rrule_1.RRule.MONTHLY:
+            case RRule.MONTHLY:
                 opts.bymonthday = opts.dtstart.getUTCDate();
                 break;
-            case rrule_1.RRule.WEEKLY:
-                opts.byweekday = [(0, dateutil_1.getWeekday)(opts.dtstart)];
+            case RRule.WEEKLY:
+                opts.byweekday = [getWeekday(opts.dtstart)];
                 break;
         }
     }
     // bymonth
-    if ((0, helpers_1.isPresent)(opts.bymonth) && !(0, helpers_1.isArray)(opts.bymonth)) {
+    if (isPresent(opts.bymonth) && !isArray(opts.bymonth)) {
         opts.bymonth = [opts.bymonth];
     }
     // byyearday
-    if ((0, helpers_1.isPresent)(opts.byyearday) &&
-        !(0, helpers_1.isArray)(opts.byyearday) &&
-        (0, helpers_1.isNumber)(opts.byyearday)) {
+    if (isPresent(opts.byyearday) &&
+        !isArray(opts.byyearday) &&
+        isNumber(opts.byyearday)) {
         opts.byyearday = [opts.byyearday];
     }
     // bymonthday
-    if (!(0, helpers_1.isPresent)(opts.bymonthday)) {
+    if (!isPresent(opts.bymonthday)) {
         opts.bymonthday = [];
         opts.bynmonthday = [];
     }
-    else if ((0, helpers_1.isArray)(opts.bymonthday)) {
+    else if (isArray(opts.bymonthday)) {
         var bymonthday = [];
         var bynmonthday = [];
         for (var i = 0; i < opts.bymonthday.length; i++) {
@@ -114,23 +110,23 @@ function parseOptions(options) {
         opts.bymonthday = [opts.bymonthday];
     }
     // byweekno
-    if ((0, helpers_1.isPresent)(opts.byweekno) && !(0, helpers_1.isArray)(opts.byweekno)) {
+    if (isPresent(opts.byweekno) && !isArray(opts.byweekno)) {
         opts.byweekno = [opts.byweekno];
     }
     // byweekday / bynweekday
-    if (!(0, helpers_1.isPresent)(opts.byweekday)) {
+    if (!isPresent(opts.byweekday)) {
         opts.bynweekday = null;
     }
-    else if ((0, helpers_1.isNumber)(opts.byweekday)) {
+    else if (isNumber(opts.byweekday)) {
         opts.byweekday = [opts.byweekday];
         opts.bynweekday = null;
     }
-    else if ((0, helpers_1.isWeekdayStr)(opts.byweekday)) {
-        opts.byweekday = [weekday_1.Weekday.fromStr(opts.byweekday).weekday];
+    else if (isWeekdayStr(opts.byweekday)) {
+        opts.byweekday = [Weekday.fromStr(opts.byweekday).weekday];
         opts.bynweekday = null;
     }
-    else if (opts.byweekday instanceof weekday_1.Weekday) {
-        if (!opts.byweekday.n || opts.freq > rrule_1.RRule.MONTHLY) {
+    else if (opts.byweekday instanceof Weekday) {
+        if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
             opts.byweekday = [opts.byweekday.weekday];
             opts.bynweekday = null;
         }
@@ -144,64 +140,62 @@ function parseOptions(options) {
         var bynweekday = [];
         for (var i = 0; i < opts.byweekday.length; i++) {
             var wday = opts.byweekday[i];
-            if ((0, helpers_1.isNumber)(wday)) {
+            if (isNumber(wday)) {
                 byweekday.push(wday);
                 continue;
             }
-            else if ((0, helpers_1.isWeekdayStr)(wday)) {
-                byweekday.push(weekday_1.Weekday.fromStr(wday).weekday);
+            else if (isWeekdayStr(wday)) {
+                byweekday.push(Weekday.fromStr(wday).weekday);
                 continue;
             }
-            if (!wday.n || opts.freq > rrule_1.RRule.MONTHLY) {
+            if (!wday.n || opts.freq > RRule.MONTHLY) {
                 byweekday.push(wday.weekday);
             }
             else {
                 bynweekday.push([wday.weekday, wday.n]);
             }
         }
-        opts.byweekday = (0, helpers_1.notEmpty)(byweekday) ? byweekday : null;
-        opts.bynweekday = (0, helpers_1.notEmpty)(bynweekday) ? bynweekday : null;
+        opts.byweekday = notEmpty(byweekday) ? byweekday : null;
+        opts.bynweekday = notEmpty(bynweekday) ? bynweekday : null;
     }
     // byhour
-    if (!(0, helpers_1.isPresent)(opts.byhour)) {
-        opts.byhour = opts.freq < rrule_1.RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null;
+    if (!isPresent(opts.byhour)) {
+        opts.byhour = opts.freq < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null;
     }
-    else if ((0, helpers_1.isNumber)(opts.byhour)) {
+    else if (isNumber(opts.byhour)) {
         opts.byhour = [opts.byhour];
     }
     // byminute
-    if (!(0, helpers_1.isPresent)(opts.byminute)) {
+    if (!isPresent(opts.byminute)) {
         opts.byminute =
-            opts.freq < rrule_1.RRule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
+            opts.freq < RRule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
     }
-    else if ((0, helpers_1.isNumber)(opts.byminute)) {
+    else if (isNumber(opts.byminute)) {
         opts.byminute = [opts.byminute];
     }
     // bysecond
-    if (!(0, helpers_1.isPresent)(opts.bysecond)) {
+    if (!isPresent(opts.bysecond)) {
         opts.bysecond =
-            opts.freq < rrule_1.RRule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
+            opts.freq < RRule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
     }
-    else if ((0, helpers_1.isNumber)(opts.bysecond)) {
+    else if (isNumber(opts.bysecond)) {
         opts.bysecond = [opts.bysecond];
     }
     return { parsedOptions: opts };
 }
-exports.parseOptions = parseOptions;
-function buildTimeset(opts) {
+export function buildTimeset(opts) {
     var millisecondModulo = opts.dtstart.getTime() % 1000;
-    if (!(0, types_1.freqIsDailyOrGreater)(opts.freq)) {
+    if (!freqIsDailyOrGreater(opts.freq)) {
         return [];
     }
     var timeset = [];
     opts.byhour.forEach(function (hour) {
         opts.byminute.forEach(function (minute) {
             opts.bysecond.forEach(function (second) {
-                timeset.push(new datetime_1.Time(hour, minute, second, millisecondModulo));
+                timeset.push(new Time(hour, minute, second, millisecondModulo));
             });
         });
     });
     return timeset;
 }
-exports.buildTimeset = buildTimeset;
 //# sourceMappingURL=parseoptions.js.map

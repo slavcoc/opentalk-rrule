@@ -1,17 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.rebuildMonth = void 0;
-var rrule_1 = require("../rrule");
-var helpers_1 = require("../helpers");
-function rebuildMonth(year, month, yearlen, mrange, wdaymask, options) {
+import { RRule } from '../rrule';
+import { empty, repeat, pymod } from '../helpers';
+export function rebuildMonth(year, month, yearlen, mrange, wdaymask, options) {
     var result = {
         lastyear: year,
         lastmonth: month,
         nwdaymask: [],
     };
     var ranges = [];
-    if (options.freq === rrule_1.RRule.YEARLY) {
-        if ((0, helpers_1.empty)(options.bymonth)) {
+    if (options.freq === RRule.YEARLY) {
+        if (empty(options.bymonth)) {
             ranges = [[0, yearlen]];
         }
         else {
@@ -21,15 +18,15 @@ function rebuildMonth(year, month, yearlen, mrange, wdaymask, options) {
             }
         }
     }
-    else if (options.freq === rrule_1.RRule.MONTHLY) {
+    else if (options.freq === RRule.MONTHLY) {
         ranges = [mrange.slice(month - 1, month + 1)];
     }
-    if ((0, helpers_1.empty)(ranges)) {
+    if (empty(ranges)) {
         return result;
     }
     // Weekly frequency won't get here, so we may not
     // care about cross-year weekly periods.
-    result.nwdaymask = (0, helpers_1.repeat)(0, yearlen);
+    result.nwdaymask = repeat(0, yearlen);
     for (var j = 0; j < ranges.length; j++) {
         var rang = ranges[j];
         var first = rang[0];
@@ -39,11 +36,11 @@ function rebuildMonth(year, month, yearlen, mrange, wdaymask, options) {
             var _a = options.bynweekday[k], wday = _a[0], n = _a[1];
             if (n < 0) {
                 i = last + (n + 1) * 7;
-                i -= (0, helpers_1.pymod)(wdaymask[i] - wday, 7);
+                i -= pymod(wdaymask[i] - wday, 7);
             }
             else {
                 i = first + (n - 1) * 7;
-                i += (0, helpers_1.pymod)(7 - wdaymask[i] + wday, 7);
+                i += pymod(7 - wdaymask[i] + wday, 7);
             }
             if (first <= i && i <= last)
                 result.nwdaymask[i] = 1;
@@ -51,5 +48,4 @@ function rebuildMonth(year, month, yearlen, mrange, wdaymask, options) {
     }
     return result;
 }
-exports.rebuildMonth = rebuildMonth;
 //# sourceMappingURL=monthinfo.js.map

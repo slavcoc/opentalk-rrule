@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.iterSet = void 0;
-var datewithzone_1 = require("./datewithzone");
-var iter_1 = require("./iter");
-var dateutil_1 = require("./dateutil");
-function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
+import { DateWithZone } from './datewithzone';
+import { iter } from './iter';
+import { sort } from './dateutil';
+export function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
     var _exdateHash = {};
     var _accept = iterResult.accept;
     function evalExdate(after, before) {
@@ -15,7 +12,7 @@ function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
         });
     }
     _exdate.forEach(function (date) {
-        var zonedDate = new datewithzone_1.DateWithZone(date, tzid).rezonedDate();
+        var zonedDate = new DateWithZone(date, tzid).rezonedDate();
         _exdateHash[Number(zonedDate)] = true;
     });
     iterResult.accept = function (date) {
@@ -43,15 +40,15 @@ function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
         };
     }
     for (var i = 0; i < _rdate.length; i++) {
-        var zonedDate = new datewithzone_1.DateWithZone(_rdate[i], tzid).rezonedDate();
+        var zonedDate = new DateWithZone(_rdate[i], tzid).rezonedDate();
         if (!iterResult.accept(new Date(zonedDate.getTime())))
             break;
     }
     _rrule.forEach(function (rrule) {
-        (0, iter_1.iter)(iterResult, rrule.options);
+        iter(iterResult, rrule.options);
     });
     var res = iterResult._result;
-    (0, dateutil_1.sort)(res);
+    sort(res);
     switch (iterResult.method) {
         case 'all':
         case 'between':
@@ -63,5 +60,4 @@ function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
             return ((res.length && res[0]) || null);
     }
 }
-exports.iterSet = iterSet;
 //# sourceMappingURL=iterset.js.map

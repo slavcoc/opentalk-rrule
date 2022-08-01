@@ -1,8 +1,6 @@
-"use strict";
 // =============================================================================
 // i18n
 // =============================================================================
-Object.defineProperty(exports, "__esModule", { value: true });
 var ENGLISH = {
     dayNames: [
         'Sunday',
@@ -72,5 +70,5 @@ var ENGLISH = {
         comma: /^(,\s*|(and|or)\s*)+/i,
     },
 };
-exports.default = ENGLISH;
+export default ENGLISH;
 //# sourceMappingURL=i18n.js.map

@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * This class helps us to emulate python's generators, sorta.
  */
@@ -86,5 +84,5 @@ var IterResult = /** @class */ (function () {
     };
     return IterResult;
 }());
-exports.default = IterResult;
+export default IterResult;
 //# sourceMappingURL=iterresult.js.map

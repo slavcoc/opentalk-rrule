@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.easter = void 0;
-function easter(y, offset) {
+export function easter(y, offset) {
     if (offset === void 0) { offset = 0; }
     var a = y % 19;
     var b = Math.floor(y / 100);
@@ -21,5 +18,4 @@ function easter(y, offset) {
     var yearStart = Date.UTC(y, 0, 1);
     return [Math.ceil((date - yearStart) / (1000 * 60 * 60 * 24))];
 }
-exports.easter = easter;
 //# sourceMappingURL=easter.js.map

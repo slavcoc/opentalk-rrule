@@ -1,13 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.toText = exports.isFullyConvertible = exports.parseText = exports.fromText = void 0;
-var tslib_1 = require("tslib");
-var totext_1 = tslib_1.__importDefault(require("./totext"));
-var parsetext_1 = tslib_1.__importDefault(require("./parsetext"));
-exports.parseText = parsetext_1.default;
-var rrule_1 = require("../rrule");
-var types_1 = require("../types");
-var i18n_1 = tslib_1.__importDefault(require("./i18n"));
+import ToText from './totext';
+import parseText from './parsetext';
+import { RRule } from '../rrule';
+import { Frequency } from '../types';
+import ENGLISH from './i18n';
 /* !
  * rrule.js - Library for working with recurrence rules for calendar dates.
  * https://github.com/jakubroztocil/rrule
@@ -98,10 +93,9 @@ var i18n_1 = tslib_1.__importDefault(require("./i18n"));
  * @return {Object, Boolean} the rule, or null.
  */
 var fromText = function (text, language) {
-    if (language === void 0) { language = i18n_1.default; }
-    return new rrule_1.RRule((0, parsetext_1.default)(text, language) || undefined);
+    if (language === void 0) { language = ENGLISH; }
+    return new RRule(parseText(text, language) || undefined);
 };
-exports.fromText = fromText;
 var common = [
     'count',
     'until',
@@ -110,20 +104,19 @@ var common = [
     'bymonthday',
     'bymonth',
 ];
-totext_1.default.IMPLEMENTED = [];
-totext_1.default.IMPLEMENTED[types_1.Frequency.HOURLY] = common;
-totext_1.default.IMPLEMENTED[types_1.Frequency.MINUTELY] = common;
-totext_1.default.IMPLEMENTED[types_1.Frequency.DAILY] = ['byhour'].concat(common);
-totext_1.default.IMPLEMENTED[types_1.Frequency.WEEKLY] = common;
-totext_1.default.IMPLEMENTED[types_1.Frequency.MONTHLY] = common;
-totext_1.default.IMPLEMENTED[types_1.Frequency.YEARLY] = ['byweekno', 'byyearday'].concat(common);
+ToText.IMPLEMENTED = [];
+ToText.IMPLEMENTED[Frequency.HOURLY] = common;
+ToText.IMPLEMENTED[Frequency.MINUTELY] = common;
+ToText.IMPLEMENTED[Frequency.DAILY] = ['byhour'].concat(common);
+ToText.IMPLEMENTED[Frequency.WEEKLY] = common;
+ToText.IMPLEMENTED[Frequency.MONTHLY] = common;
+ToText.IMPLEMENTED[Frequency.YEARLY] = ['byweekno', 'byyearday'].concat(common);
 // =============================================================================
 // Export
 // =============================================================================
 var toText = function (rrule, gettext, language, dateFormatter) {
-    return new totext_1.default(rrule, gettext, language, dateFormatter).toString();
+    return new ToText(rrule, gettext, language, dateFormatter).toString();
 };
-exports.toText = toText;
-var isFullyConvertible = totext_1.default.isFullyConvertible;
-exports.isFullyConvertible = isFullyConvertible;
+var isFullyConvertible = ToText.isFullyConvertible;
+export { fromText, parseText, isFullyConvertible, toText };
 //# sourceMappingURL=index.js.map

@@ -1,10 +1,7 @@
-"use strict";
 // =============================================================================
 // Weekday
 // =============================================================================
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Weekday = exports.ALL_WEEKDAYS = void 0;
-exports.ALL_WEEKDAYS = [
+export var ALL_WEEKDAYS = [
     'MO',
     'TU',
     'WE',
@@ -21,7 +18,7 @@ var Weekday = /** @class */ (function () {
         this.n = n;
     }
     Weekday.fromStr = function (str) {
-        return new Weekday(exports.ALL_WEEKDAYS.indexOf(str));
+        return new Weekday(ALL_WEEKDAYS.indexOf(str));
     };
     // __call__ - Cannot call the object directly, do it through
     // e.g. RRule.TH.nth(-1) instead,
@@ -34,7 +31,7 @@ var Weekday = /** @class */ (function () {
     };
     // __repr__
     Weekday.prototype.toString = function () {
-        var s = exports.ALL_WEEKDAYS[this.weekday];
+        var s = ALL_WEEKDAYS[this.weekday];
         if (this.n)
             s = (this.n > 0 ? '+' : '') + String(this.n) + s;
         return s;
@@ -44,5 +41,5 @@ var Weekday = /** @class */ (function () {
     };
     return Weekday;
 }());
-exports.Weekday = Weekday;
+export { Weekday };
 //# sourceMappingURL=weekday.js.map

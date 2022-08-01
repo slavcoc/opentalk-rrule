@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DateTime = exports.Time = void 0;
-var tslib_1 = require("tslib");
-var types_1 = require("./types");
-var helpers_1 = require("./helpers");
-var dateutil_1 = require("./dateutil");
+import { __extends } from "tslib";
+import { Frequency } from './types';
+import { pymod, divmod, empty, includes } from './helpers';
+import { getWeekday, MAXYEAR, monthRange } from './dateutil';
 var Time = /** @class */ (function () {
     function Time(hour, minute, second, millisecond) {
         this.hour = hour;
@@ -30,9 +27,9 @@ var Time = /** @class */ (function () {
     };
     return Time;
 }());
-exports.Time = Time;
+export { Time };
 var DateTime = /** @class */ (function (_super) {
-    tslib_1.__extends(DateTime, _super);
+    __extends(DateTime, _super);
     function DateTime(year, month, day, hour, minute, second, millisecond) {
         var _this = _super.call(this, hour, minute, second, millisecond) || this;
         _this.year = year;
@@ -44,7 +41,7 @@ var DateTime = /** @class */ (function (_super) {
         return new this(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.valueOf() % 1000);
     };
     DateTime.prototype.getWeekday = function () {
-        return (0, dateutil_1.getWeekday)(new Date(this.getTime()));
+        return getWeekday(new Date(this.getTime()));
     };
     DateTime.prototype.getTime = function () {
         return new Date(Date.UTC(this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond)).getTime();
@@ -65,7 +62,7 @@ var DateTime = /** @class */ (function (_super) {
         this.month += months;
         if (this.month > 12) {
             var yearDiv = Math.floor(this.month / 12);
-            var monthMod = (0, helpers_1.pymod)(this.month, 12);
+            var monthMod = pymod(this.month, 12);
             this.month = monthMod;
             this.year += yearDiv;
             if (this.month === 0) {
@@ -94,12 +91,12 @@ var DateTime = /** @class */ (function (_super) {
         }
         for (;;) {
             this.hour += hours;
-            var _a = (0, helpers_1.divmod)(this.hour, 24), dayDiv = _a.div, hourMod = _a.mod;
+            var _a = divmod(this.hour, 24), dayDiv = _a.div, hourMod = _a.mod;
             if (dayDiv) {
                 this.hour = hourMod;
                 this.addDaily(dayDiv);
             }
-            if ((0, helpers_1.empty)(byhour) || (0, helpers_1.includes)(byhour, this.hour))
+            if (empty(byhour) || includes(byhour, this.hour))
                 break;
         }
     };
@@ -111,13 +108,13 @@ var DateTime = /** @class */ (function (_super) {
         }
         for (;;) {
             this.minute += minutes;
-            var _a = (0, helpers_1.divmod)(this.minute, 60), hourDiv = _a.div, minuteMod = _a.mod;
+            var _a = divmod(this.minute, 60), hourDiv = _a.div, minuteMod = _a.mod;
             if (hourDiv) {
                 this.minute = minuteMod;
                 this.addHours(hourDiv, false, byhour);
             }
-            if (((0, helpers_1.empty)(byhour) || (0, helpers_1.includes)(byhour, this.hour)) &&
-                ((0, helpers_1.empty)(byminute) || (0, helpers_1.includes)(byminute, this.minute))) {
+            if ((empty(byhour) || includes(byhour, this.hour)) &&
+                (empty(byminute) || includes(byminute, this.minute))) {
                 break;
             }
         }
@@ -131,14 +128,14 @@ var DateTime = /** @class */ (function (_super) {
         }
         for (;;) {
             this.second += seconds;
-            var _a = (0, helpers_1.divmod)(this.second, 60), minuteDiv = _a.div, secondMod = _a.mod;
+            var _a = divmod(this.second, 60), minuteDiv = _a.div, secondMod = _a.mod;
             if (minuteDiv) {
                 this.second = secondMod;
                 this.addMinutes(minuteDiv, false, byhour, byminute);
             }
-            if (((0, helpers_1.empty)(byhour) || (0, helpers_1.includes)(byhour, this.hour)) &&
-                ((0, helpers_1.empty)(byminute) || (0, helpers_1.includes)(byminute, this.minute)) &&
-                ((0, helpers_1.empty)(bysecond) || (0, helpers_1.includes)(bysecond, this.second))) {
+            if ((empty(byhour) || includes(byhour, this.hour)) &&
+                (empty(byminute) || includes(byminute, this.minute)) &&
+                (empty(bysecond) || includes(bysecond, this.second))) {
                 break;
             }
         }
@@ -147,7 +144,7 @@ var DateTime = /** @class */ (function (_super) {
         if (this.day <= 28) {
             return;
         }
-        var daysinmonth = (0, dateutil_1.monthRange)(this.year, this.month - 1)[1];
+        var daysinmonth = monthRange(this.year, this.month - 1)[1];
         if (this.day <= daysinmonth) {
             return;
         }
@@ -157,33 +154,33 @@ var DateTime = /** @class */ (function (_super) {
             if (this.month === 13) {
                 this.month = 1;
                 ++this.year;
-                if (this.year > dateutil_1.MAXYEAR) {
+                if (this.year > MAXYEAR) {
                     return;
                 }
             }
-            daysinmonth = (0, dateutil_1.monthRange)(this.year, this.month - 1)[1];
+            daysinmonth = monthRange(this.year, this.month - 1)[1];
         }
     };
     DateTime.prototype.add = function (options, filtered) {
         var freq = options.freq, interval = options.interval, wkst = options.wkst, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
         switch (freq) {
-            case types_1.Frequency.YEARLY:
+            case Frequency.YEARLY:
                 return this.addYears(interval);
-            case types_1.Frequency.MONTHLY:
+            case Frequency.MONTHLY:
                 return this.addMonths(interval);
-            case types_1.Frequency.WEEKLY:
+            case Frequency.WEEKLY:
                 return this.addWeekly(interval, wkst);
-            case types_1.Frequency.DAILY:
+            case Frequency.DAILY:
                 return this.addDaily(interval);
-            case types_1.Frequency.HOURLY:
+            case Frequency.HOURLY:
                 return this.addHours(interval, filtered, byhour);
-            case types_1.Frequency.MINUTELY:
+            case Frequency.MINUTELY:
                 return this.addMinutes(interval, filtered, byhour, byminute);
-            case types_1.Frequency.SECONDLY:
+            case Frequency.SECONDLY:
                 return this.addSeconds(interval, filtered, byhour, byminute, bysecond);
         }
     };
     return DateTime;
 }(Time));
-exports.DateTime = DateTime;
+export { DateTime };
 //# sourceMappingURL=datetime.js.map

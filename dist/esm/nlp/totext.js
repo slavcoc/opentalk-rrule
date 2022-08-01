@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var tslib_1 = require("tslib");
-var i18n_1 = tslib_1.__importDefault(require("./i18n"));
-var rrule_1 = require("../rrule");
-var helpers_1 = require("../helpers");
+import ENGLISH from './i18n';
+import { RRule } from '../rrule';
+import { isArray, isNumber, isPresent } from '../helpers';
 // =============================================================================
 // Helper functions
 // =============================================================================
@@ -26,10 +23,10 @@ var defaultDateFormatter = function (year, month, day) { return "".concat(month,
 var ToText = /** @class */ (function () {
     function ToText(rrule, gettext, language, dateFormatter) {
         if (gettext === void 0) { gettext = defaultGetText; }
-        if (language === void 0) { language = i18n_1.default; }
+        if (language === void 0) { language = ENGLISH; }
         if (dateFormatter === void 0) { dateFormatter = defaultDateFormatter; }
         this.text = [];
-        this.language = language || i18n_1.default;
+        this.language = language || ENGLISH;
         this.gettext = gettext;
         this.dateFormatter = dateFormatter;
         this.rrule = rrule;
@@ -45,8 +42,8 @@ var ToText = /** @class */ (function () {
             if (!this.bymonthday.length)
                 this.bymonthday = null;
         }
-        if ((0, helpers_1.isPresent)(this.origOptions.byweekday)) {
-            var byweekday = !(0, helpers_1.isArray)(this.origOptions.byweekday)
+        if (isPresent(this.origOptions.byweekday)) {
+            var byweekday = !isArray(this.origOptions.byweekday)
                 ? [this.origOptions.byweekday]
                 : this.origOptions.byweekday;
             var days = String(byweekday);
@@ -124,7 +121,7 @@ var ToText = /** @class */ (function () {
         this.text = [gettext('every')];
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        this[rrule_1.RRule.FREQUENCIES[this.options.freq]]();
+        this[RRule.FREQUENCIES[this.options.freq]]();
         if (this.options.until) {
             this.add(gettext('until'));
             var until = this.options.until;
@@ -341,7 +338,7 @@ var ToText = /** @class */ (function () {
         return this.language.monthNames[m - 1];
     };
     ToText.prototype.weekdaytext = function (wday) {
-        var weekday = (0, helpers_1.isNumber)(wday) ? (wday + 1) % 7 : wday.getJsWeekday();
+        var weekday = isNumber(wday) ? (wday + 1) % 7 : wday.getJsWeekday();
         return ((wday.n ? this.nth(wday.n) + ' ' : '') +
             this.language.dayNames[weekday]);
     };
@@ -356,7 +353,7 @@ var ToText = /** @class */ (function () {
     ToText.prototype.list = function (arr, callback, finalDelim, delim) {
         var _this = this;
         if (delim === void 0) { delim = ','; }
-        if (!(0, helpers_1.isArray)(arr)) {
+        if (!isArray(arr)) {
             arr = [arr];
         }
         var delimJoin = function (array, delimiter, finalDelimiter) {
@@ -391,5 +388,5 @@ var ToText = /** @class */ (function () {
     };
     return ToText;
 }());
-exports.default = ToText;
+export default ToText;
 //# sourceMappingURL=totext.js.map
